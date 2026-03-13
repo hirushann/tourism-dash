@@ -12,40 +12,46 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $superAdminRole = \Spatie\Permission\Models\Role::create(['name' => 'super admin']);
-        $managerRole = \Spatie\Permission\Models\Role::create(['name' => 'manager']);
-        $driverRole = \Spatie\Permission\Models\Role::create(['name' => 'driver']);
+        $superAdminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'super admin']);
+        $managerRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'manager']);
+        $driverRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'driver']);
 
-        $manageVehicles = \Spatie\Permission\Models\Permission::create(['name' => 'manage vehicles']);
-        $assignVehicles = \Spatie\Permission\Models\Permission::create(['name' => 'assign vehicles']);
-        $viewVehicles = \Spatie\Permission\Models\Permission::create(['name' => 'view vehicles']);
-        $manageTours = \Spatie\Permission\Models\Permission::create(['name' => 'manage tours']);
-        $viewTours = \Spatie\Permission\Models\Permission::create(['name' => 'view tours']);
-        $generateReports = \Spatie\Permission\Models\Permission::create(['name' => 'generate reports']);
+        $manageVehicles = \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'manage vehicles']);
+        $assignVehicles = \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'assign vehicles']);
+        $viewVehicles = \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'view vehicles']);
+        $manageTours = \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'manage tours']);
+        $viewTours = \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'view tours']);
+        $generateReports = \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'generate reports']);
 
-        $superAdminRole->givePermissionTo([\Spatie\Permission\Models\Permission::all()]);
-        $managerRole->givePermissionTo([$manageVehicles, $assignVehicles, $viewVehicles, $manageTours, $viewTours, $generateReports]);
-        $driverRole->givePermissionTo([$viewVehicles, $manageTours, $viewTours]);
+        $superAdminRole->syncPermissions(\Spatie\Permission\Models\Permission::all());
+        $managerRole->syncPermissions([$manageVehicles, $assignVehicles, $viewVehicles, $manageTours, $viewTours, $generateReports]);
+        $driverRole->syncPermissions([$viewVehicles, $manageTours, $viewTours]);
 
-        $superAdmin = \App\Models\User::create([
-            'name' => 'Super Admin',
-            'email' => 'admin@tourism-dash.com',
-            'password' => \Illuminate\Support\Facades\Hash::make('password'),
-        ]);
+        $superAdmin = \App\Models\User::updateOrCreate(
+            ['email' => 'admin@tourism-dash.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+            ]
+        );
         $superAdmin->assignRole($superAdminRole);
 
-        $manager = \App\Models\User::create([
-            'name' => 'Manager',
-            'email' => 'manager@tourism-dash.com',
-            'password' => \Illuminate\Support\Facades\Hash::make('password'),
-        ]);
+        $manager = \App\Models\User::updateOrCreate(
+            ['email' => 'manager@tourism-dash.com'],
+            [
+                'name' => 'Manager',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+            ]
+        );
         $manager->assignRole($managerRole);
 
-        $driver = \App\Models\User::create([
-            'name' => 'Driver',
-            'email' => 'driver@tourism-dash.com',
-            'password' => \Illuminate\Support\Facades\Hash::make('password'),
-        ]);
+        $driver = \App\Models\User::updateOrCreate(
+            ['email' => 'driver@tourism-dash.com'],
+            [
+                'name' => 'Driver',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+            ]
+        );
         $driver->assignRole($driverRole);
     }
 }
