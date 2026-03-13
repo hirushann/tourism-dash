@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasRoles;
@@ -64,5 +66,11 @@ class User extends Authenticatable
     public function vehicles()
     {
         return $this->hasMany(Vehicle::class, 'driver_id');
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Add auth logic here if needed, for example verifying if user is admin
+        return true; 
     }
 }
